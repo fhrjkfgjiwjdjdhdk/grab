@@ -502,6 +502,18 @@
 <!-- Copy toast -->
 <div class="copy-toast" id="copyToast">📋 連結已複製！直接貼上即可</div>
 
+<!-- PWA Banner -->
+<div id="pwaBanner" style="display:none; position:fixed; bottom:0; left:0; right:0; background:#13131a; border-top:1.5px solid #39ff8f; padding:14px 16px; z-index:200; flex-direction:column; gap:10px;">
+  <div style="font-size:13px; color:#e8e8f0; line-height:1.6;">
+    💡 <strong style="color:#39ff8f;">小提示：</strong>點下載服務後，連結會在同一個視窗開啟，無法直接下載。<br>
+    建議改用 <strong>Safari 直接開啟 STASH</strong>，就能正常跳出新分頁下載！
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button id="copyStashBtn" onclick="copyStashUrl()" style="flex:1; background:#39ff8f; color:#0a0a0f; border:none; border-radius:8px; padding:10px; font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer;">複製 STASH 網址</button>
+    <button onclick="document.getElementById('pwaBanner').style.display='none'" style="background:transparent; color:#5a5a7a; border:1px solid #1e1e2e; border-radius:8px; padding:10px 14px; font-size:12px; cursor:pointer;">我知道了</button>
+  </div>
+</div>
+
 <script>
 const SERVICES = {
   instagram: {
@@ -560,43 +572,31 @@ const SERVICES = {
   }
 };
 
-// Force open in Safari from PWA mode on iOS
+// Open external links normally (new tab on desktop/Safari, same window on PWA)
 function openExternal(url) {
-  // Detect if running as iOS PWA (standalone mode)
-  const isIOSPWA = window.navigator.standalone === true;
-  
-  if (isIOSPWA) {
-    // Use a hidden iframe trick to trigger Safari to open the URL externally
-    // This works because iOS intercepts certain navigations and opens them in Safari
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    
-    // Try location assign inside iframe first
-    try {
-      iframe.contentWindow.location.href = url;
-      setTimeout(() => document.body.removeChild(iframe), 1000);
-    } catch(e) {
-      document.body.removeChild(iframe);
-      // Fallback: use anchor with target _blank and simulate tap
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 500);
-    }
-  } else {
-    // Desktop or Safari browser: normal new tab
-    const a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Show PWA warning banner if running in iOS standalone mode
+function checkPWAMode() {
+  if (window.navigator.standalone === true) {
+    document.getElementById('pwaBanner').style.display = 'flex';
   }
+}
+
+function copyStashUrl() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyStashBtn');
+    btn.textContent = '✓ 已複製！去 Safari 貼上開啟';
+    setTimeout(() => { btn.textContent = '複製 STASH 網址'; }, 3000);
+  });
 }
 
 // Copy URL to clipboard then open service
@@ -736,6 +736,9 @@ document.getElementById('urlInput').addEventListener('input', function() {
 document.getElementById('urlInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') detectAndGo();
 });
+
+// Check if running in PWA mode
+checkPWAMode();
 </script>
 </body>
 </html>
