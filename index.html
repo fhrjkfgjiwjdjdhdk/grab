@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GRAB">
 <title>GRAB — 社群影音下載中心</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
@@ -497,6 +500,21 @@ const SERVICES = {
   }
 };
 
+// Force open external links in Safari (bypasses PWA/standalone mode restriction)
+function openExternal(url) {
+  // Create a real anchor and simulate click — works in PWA standalone mode on iOS
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  // For iOS PWA: use location.href as fallback if _blank is blocked
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // iOS Safari PWA fallback: if still here after 500ms, navigate directly
+  setTimeout(() => { window.location.href = url; }, 500);
+}
+
 function detectPlatform(url) {
   url = url.toLowerCase();
   if (url.includes('instagram.com')) return 'instagram';
@@ -518,13 +536,13 @@ function showResult(platform) {
 
   title.textContent = '✓ ' + data.label + ' — 選擇下載服務';
   list.innerHTML = data.services.map(s => `
-    <a class="service-link" href="${s.url}" target="_blank" rel="noopener">
+    <div class="service-link" onclick="openExternal('${s.url}')" role="button" tabindex="0">
       <div>
         <div class="service-link-name">${s.name}</div>
         <div class="service-link-url">${s.desc}</div>
       </div>
       <div class="service-link-arrow">↗</div>
-    </a>
+    </div>
   `).join('');
 
   panel.classList.add('visible');
