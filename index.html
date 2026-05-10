@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GRAB">
@@ -33,6 +33,12 @@
     font-family: 'Noto Sans TC', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    width: 100%;
+  }
+
+  html {
+    overflow-x: hidden;
+    width: 100%;
   }
 
   /* Background grid */
@@ -65,8 +71,10 @@
     position: relative;
     z-index: 1;
     max-width: 720px;
+    width: 100%;
     margin: 0 auto;
-    padding: 60px 24px 80px;
+    padding: 48px 16px 80px;
+    box-sizing: border-box;
   }
 
   /* Header */
@@ -518,8 +526,8 @@ const SERVICES = {
     label: '偵測到 Bilibili 連結',
     color: '#00a1d6',
     services: [
-      { name: 'DLBunny', url: 'https://dlbunny.com/en/bilibili', desc: 'dlbunny.com — 支援多格式，免安裝' },
-      { name: 'VideoDubber', url: 'https://videodubber.ai/tools/bilibili/video-downloader/', desc: 'videodubber.ai — 支援字幕下載' },
+      { name: 'SnapAny', url: 'https://snapany.com/bilibili', desc: 'snapany.com — 支援 b23.tv 短網址，免登入' },
+      { name: 'SnapWC', url: 'https://snapwc.com/bilibili', desc: 'snapwc.com — 支援多畫質選擇' },
       { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源工具，支援 B站' },
     ]
   },
@@ -630,12 +638,15 @@ function showResult(platform) {
 
   panel.classList.add('visible');
 
+  // Highlight matching card (no scroll)
   document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
   const match = document.querySelector(`.card[data-platform="${platform}"]`);
-  if (match) {
-    match.classList.add('highlighted');
-    match.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
+  if (match) match.classList.add('highlighted');
+
+  // Scroll to result panel
+  setTimeout(() => {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
 }
 
 function detectAndGo() {
