@@ -509,7 +509,7 @@
     建議改用 <strong>Safari 直接開啟 STASH</strong>，就能正常跳出新分頁下載！
   </div>
   <div style="display:flex; gap:8px;">
-    <button id="copyStashBtn" onclick="openInSafari()" style="flex:1; background:#39ff8f; color:#0a0a0f; border:none; border-radius:8px; padding:10px; font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer;">用 Safari 開啟 STASH</button>
+    <button id="copyStashBtn" onclick="copyStashUrl()" style="flex:1; background:#39ff8f; color:#0a0a0f; border:none; border-radius:8px; padding:10px; font-family:'Syne',sans-serif; font-weight:700; font-size:12px; cursor:pointer;">複製 STASH 網址</button>
     <button onclick="document.getElementById('pwaBanner').style.display='none'" style="background:transparent; color:#5a5a7a; border:1px solid #1e1e2e; border-radius:8px; padding:10px 14px; font-size:12px; cursor:pointer;">我知道了</button>
   </div>
 </div>
@@ -590,16 +590,13 @@ function checkPWAMode() {
   }
 }
 
-function openInSafari() {
+function copyStashUrl() {
   const url = window.location.href;
-  // On iOS PWA, location.assign to a URL with a delay triggers Safari
-  const a = document.createElement('a');
-  a.href = url;
-  a.rel = 'noopener noreferrer';
-  // Force iOS to treat this as external navigation
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copyStashBtn');
+    btn.textContent = '✓ 已複製！去 Safari 貼上開啟';
+    setTimeout(() => { btn.textContent = '複製 STASH 網址'; }, 3000);
+  });
 }
 
 // Copy URL to clipboard then open service
