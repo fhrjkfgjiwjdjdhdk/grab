@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRAB — 社群影音下載中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --accent-ig: #e1306c;
+    --accent-th: #000000;
+    --accent-bi: #00a1d6;
+    --accent-yt: #ff0000;
+    --accent-tk: #ff0050;
+    --green: #39ff8f;
+    --yellow: #f5e642;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(57,255,143,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,255,143,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blob */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(57,255,143,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 56px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(52px, 10vw, 80px);
+    letter-spacing: -4px;
+    line-height: 1;
+    color: var(--green);
+    text-shadow: 0 0 40px rgba(57,255,143,0.4);
+    display: block;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 10px;
+    font-weight: 300;
+  }
+
+  /* Input area */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .url-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 140px 20px 20px;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.5;
+  }
+
+  .url-input::placeholder { color: var(--muted); }
+
+  .url-input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(57,255,143,0.1), 0 0 20px rgba(57,255,143,0.05);
+  }
+
+  .detect-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--green);
+    color: #0a0a0f;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 18px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    white-space: nowrap;
+  }
+
+  .detect-btn:hover { opacity: 0.85; transform: translateY(-50%) scale(0.98); }
+  .detect-btn:active { transform: translateY(-50%) scale(0.95); }
+
+  /* Platform indicator */
+  .platform-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    animation: slideIn 0.3s ease;
+  }
+
+  .platform-badge.visible { display: flex; }
+
+  .platform-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Cards grid */
+  .services-section {
+    margin-top: 40px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover { transform: translateY(-2px); }
+  .card:hover::before { opacity: 1; }
+  .card:active { transform: translateY(0) scale(0.99); }
+
+  /* Per-platform colors */
+  .card[data-platform="instagram"] { --clr: var(--accent-ig); }
+  .card[data-platform="threads"]   { --clr: #9b72f5; }
+  .card[data-platform="bilibili"]  { --clr: var(--accent-bi); }
+  .card[data-platform="youtube"]   { --clr: var(--accent-yt); }
+  .card[data-platform="tiktok"]    { --clr: var(--accent-tk); }
+  .card[data-platform="twitter"]   { --clr: #1d9bf0; }
+
+  .card::before {
+    background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--clr) 8%, transparent), transparent 70%);
+  }
+
+  .card:hover {
+    border-color: color-mix(in srgb, var(--clr) 50%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--clr) 12%, transparent);
+  }
+
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--clr) 15%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-size: 18px;
+  }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .card-arrow {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 14px;
+    color: var(--muted);
+    transition: transform 0.2s, color 0.2s;
+  }
+
+  .card:hover .card-arrow {
+    transform: translate(2px, -2px);
+    color: var(--clr);
+  }
+
+  /* Result panel */
+  .result-panel {
+    display: none;
+    background: var(--surface);
+    border: 1.5px solid var(--green);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 0 30px rgba(57,255,143,0.08);
+    animation: slideIn 0.3s ease;
+  }
+
+  .result-panel.visible { display: block; }
+
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--green);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  .service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .service-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    transition: border-color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+
+  .service-link:hover {
+    border-color: var(--green);
+    background: rgba(57,255,143,0.04);
+  }
+
+  .service-link-name { font-weight: 500; }
+  .service-link-url { color: var(--muted); font-size: 11px; }
+  .service-link-arrow { color: var(--green); font-size: 14px; }
+
+  /* Note */
+  .note {
+    margin-top: 32px;
+    padding: 16px;
+    border-left: 2px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .note strong { color: color-mix(in srgb, var(--text) 60%, var(--muted)); }
+
+  /* Highlight matched card */
+  .card.highlighted {
+    border-color: color-mix(in srgb, var(--clr) 60%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--clr) 15%, transparent);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="logo">GRAB</span>
+    <p class="tagline">社群影音下載導航中心</p>
+  </header>
+
+  <!-- URL Input -->
+  <div class="input-wrap">
+    <input
+      class="url-input"
+      id="urlInput"
+      type="url"
+      placeholder="貼上連結，自動判斷平台…"
+      autocomplete="off"
+      spellcheck="false"
+    />
+    <button class="detect-btn" onclick="detectAndGo()">去下載 →</button>
+  </div>
+
+  <!-- Platform badge -->
+  <div class="platform-badge" id="platformBadge">
+    <span class="dot" id="platformDot"></span>
+    <span id="platformText"></span>
+  </div>
+
+  <!-- Result panel (auto-detected services) -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-title" id="resultTitle"></div>
+    <div class="service-list" id="serviceList"></div>
+  </div>
+
+  <!-- All platforms -->
+  <div class="services-section">
+    <p class="section-label">所有支援平台</p>
+    <div class="cards" id="cardsGrid">
+
+      <a class="card" data-platform="instagram" href="#" onclick="openServices('instagram', event)">
+        <div class="card-icon">📸</div>
+        <div class="card-name">Instagram</div>
+        <div class="card-desc">照片、Reels、限時動態影片</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+      <a class="card" data-platform="threads" href="#" onclick="openServices('threads', event)">
+        <div class="card-icon">🧵</div>
+        <div class="card-name">Threads</div>
+        <div class="card-desc">貼文影片、圖片</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+      <a class="card" data-platform="bilibili" href="#" onclick="openServices('bilibili', event)">
+        <div class="card-icon">📺</div>
+        <div class="card-name">Bilibili</div>
+        <div class="card-desc">B站影片下載</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+      <a class="card" data-platform="youtube" href="#" onclick="openServices('youtube', event)">
+        <div class="card-icon">▶️</div>
+        <div class="card-name">YouTube</div>
+        <div class="card-desc">影片、Shorts、音訊</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+      <a class="card" data-platform="tiktok" href="#" onclick="openServices('tiktok', event)">
+        <div class="card-icon">🎵</div>
+        <div class="card-name">TikTok</div>
+        <div class="card-desc">無浮水印影片下載</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+      <a class="card" data-platform="twitter" href="#" onclick="openServices('twitter', event)">
+        <div class="card-icon">𝕏</div>
+        <div class="card-name">Twitter / X</div>
+        <div class="card-desc">推文影片、GIF</div>
+        <div class="card-arrow">↗</div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>使用說明：</strong>貼上連結後點「去下載」，系統會自動偵測平台並列出推薦的下載工具。<br>
+    或直接點下方平台卡片，手動選擇服務。<br><br>
+    <strong>注意：</strong>下載前請確認該內容你有權下載，尊重創作者版權。部分服務為第三方網站，使用前請自行評估。
+  </div>
+
+</div>
+
+<script>
+const SERVICES = {
+  instagram: {
+    label: '偵測到 Instagram 連結',
+    color: '#e1306c',
+    services: [
+      { name: 'SnapInsta', url: 'https://snapinsta.app/zh-tw/', desc: 'snapinsta.app — 支援照片 / Reels / 限時動態' },
+      { name: 'SaveIG', url: 'https://saveig.app/', desc: 'saveig.app — 批次下載照片' },
+      { name: 'Inflact IG Downloader', url: 'https://inflact.com/downloader/instagram/video/', desc: 'inflact.com — 支援私人帳號（需授權）' },
+    ]
+  },
+  threads: {
+    label: '偵測到 Threads 連結',
+    color: '#9b72f5',
+    services: [
+      { name: 'SaveThreads', url: 'https://savethreads.net/', desc: 'savethreads.net — 貼文影片、圖片下載' },
+      { name: 'ThreadsDown', url: 'https://threadsdown.com/', desc: 'threadsdown.com — 快速下載' },
+      { name: 'SSSTik (通用)', url: 'https://ssstik.io/zh-tw', desc: 'ssstik.io — 也支援 Threads 影片' },
+    ]
+  },
+  bilibili: {
+    label: '偵測到 Bilibili 連結',
+    color: '#00a1d6',
+    services: [
+      { name: 'Bilibili Downloader (bili.iiilab)', url: 'https://bili.iiilab.com/', desc: 'bili.iiilab.com — 支援 4K、彈幕下載' },
+      { name: 'xBeibei', url: 'https://xbeibei.com/', desc: 'xbeibei.com — 批次下載合集' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源工具，支援 B站' },
+    ]
+  },
+  youtube: {
+    label: '偵測到 YouTube 連結',
+    color: '#ff0000',
+    services: [
+      { name: 'yt-dlp (指令)', url: 'https://github.com/yt-dlp/yt-dlp', desc: 'github.com — 最強大的下載工具（需安裝）' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 網頁版，支援多畫質' },
+      { name: 'Y2Mate', url: 'https://www.y2mate.com/zh-tw', desc: 'y2mate.com — 線上快速下載' },
+    ]
+  },
+  tiktok: {
+    label: '偵測到 TikTok 連結',
+    color: '#ff0050',
+    services: [
+      { name: 'SSSTik', url: 'https://ssstik.io/zh-tw', desc: 'ssstik.io — 無浮水印下載' },
+      { name: 'SnapTik', url: 'https://snaptik.app/zh-tw', desc: 'snaptik.app — 快速無浮水印' },
+      { name: 'TikMate', url: 'https://tikmate.online/', desc: 'tikmate.online — 支援音樂提取' },
+    ]
+  },
+  twitter: {
+    label: '偵測到 Twitter / X 連結',
+    color: '#1d9bf0',
+    services: [
+      { name: 'TwitXR', url: 'https://twitxr.com/', desc: 'twitxr.com — X 影片快速下載' },
+      { name: 'SaveTwitter', url: 'https://www.savetwitter.net/', desc: 'savetwitter.net — 支援 GIF 下載' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源，支援 Twitter' },
+    ]
+  }
+};
+
+function detectPlatform(url) {
+  url = url.toLowerCase();
+  if (url.includes('instagram.com')) return 'instagram';
+  if (url.includes('threads.net')) return 'threads';
+  if (url.includes('bilibili.com') || url.includes('b23.tv')) return 'bilibili';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  if (url.includes('tiktok.com')) return 'tiktok';
+  if (url.includes('twitter.com') || url.includes('x.com') || url.includes('t.co')) return 'twitter';
+  return null;
+}
+
+function showResult(platform) {
+  const data = SERVICES[platform];
+  if (!data) return;
+
+  const panel = document.getElementById('resultPanel');
+  const title = document.getElementById('resultTitle');
+  const list = document.getElementById('serviceList');
+
+  title.textContent = '✓ ' + data.label + ' — 選擇下載服務';
+  list.innerHTML = data.services.map(s => `
+    <a class="service-link" href="${s.url}" target="_blank" rel="noopener">
+      <div>
+        <div class="service-link-name">${s.name}</div>
+        <div class="service-link-url">${s.desc}</div>
+      </div>
+      <div class="service-link-arrow">↗</div>
+    </a>
+  `).join('');
+
+  panel.classList.add('visible');
+
+  // Highlight matching card
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
+  const match = document.querySelector(`.card[data-platform="${platform}"]`);
+  if (match) {
+    match.classList.add('highlighted');
+    match.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function detectAndGo() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+
+  const platform = detectPlatform(url);
+  const badge = document.getElementById('platformBadge');
+  const dot = document.getElementById('platformDot');
+  const text = document.getElementById('platformText');
+
+  if (platform) {
+    const data = SERVICES[platform];
+    dot.style.background = data.color;
+    text.textContent = data.label;
+    badge.classList.add('visible');
+    showResult(platform);
+  } else {
+    dot.style.background = '#f5e642';
+    text.textContent = '無法辨識平台，請手動選擇下方服務';
+    badge.classList.add('visible');
+    document.getElementById('resultPanel').classList.remove('visible');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
+  }
+}
+
+function openServices(platform, e) {
+  e.preventDefault();
+  document.getElementById('urlInput').value = '';
+  document.getElementById('platformBadge').classList.remove('visible');
+  showResult(platform);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Live detection on paste/type
+document.getElementById('urlInput').addEventListener('input', function() {
+  const url = this.value.trim();
+  if (!url) {
+    document.getElementById('platformBadge').classList.remove('visible');
+    document.getElementById('resultPanel').classList.remove('visible');
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
+    return;
+  }
+  const platform = detectPlatform(url);
+  const badge = document.getElementById('platformBadge');
+  const dot = document.getElementById('platformDot');
+  const text = document.getElementById('platformText');
+
+  if (platform) {
+    dot.style.background = SERVICES[platform].color;
+    text.textContent = SERVICES[platform].label;
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
+});
+
+// Enter key
+document.getElementById('urlInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') detectAndGo();
+});
+</script>
+</body>
+</html>
