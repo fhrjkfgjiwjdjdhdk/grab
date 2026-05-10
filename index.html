@@ -332,6 +332,30 @@
   .service-link-url { color: var(--muted); font-size: 11px; }
   .service-link-arrow { color: var(--green); font-size: 14px; }
 
+  .autofill-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 400;
+    background: rgba(57,255,143,0.15);
+    color: var(--green);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .manual-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 400;
+    background: rgba(245,230,66,0.12);
+    color: var(--yellow);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
   /* Note */
   .note {
     margin-top: 32px;
@@ -448,54 +472,54 @@ const SERVICES = {
     label: '偵測到 Instagram 連結',
     color: '#e1306c',
     services: [
-      { name: 'SnapInsta', url: 'https://snapinsta.to/', desc: 'snapinsta.to — 支援照片 / Reels / 限時動態' },
-      { name: 'Snapinta', url: 'https://snapinta.app/en', desc: 'snapinta.app — 快速下載，支援所有格式' },
-      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源工具，乾淨無廣告' },
+      { name: 'SnapInsta', url: 'https://snapinsta.to/', autofill: 'https://snapinsta.to/?url=', desc: 'snapinsta.to — 支援照片 / Reels / 限時動態' },
+      { name: 'Snapinta', url: 'https://snapinta.app/en', autofill: null, desc: 'snapinta.app — 快速下載，支援所有格式' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', autofill: 'https://cobalt.tools/?u=', desc: 'cobalt.tools — 開源工具，乾淨無廣告' },
     ]
   },
   threads: {
     label: '偵測到 Threads 連結',
     color: '#9b72f5',
     services: [
-      { name: 'SnapThreads', url: 'https://snapthreads.net/', desc: 'snapthreads.net — 持續更新，支援新連結格式' },
-      { name: 'SaveThreads', url: 'https://savethreads.io/en', desc: 'savethreads.io — 免登入快速下載' },
-      { name: 'ThreadsDownloader', url: 'https://threadsdownloader.com/', desc: 'threadsdownloader.com — iOS 可直接存相簿' },
+      { name: 'SnapThreads', url: 'https://snapthreads.net/', autofill: null, desc: 'snapthreads.net — 持續更新，支援新連結格式' },
+      { name: 'SaveThreads', url: 'https://savethreads.io/en', autofill: null, desc: 'savethreads.io — 免登入快速下載' },
+      { name: 'ThreadsDownloader', url: 'https://threadsdownloader.com/', autofill: null, desc: 'threadsdownloader.com — iOS 可直接存相簿' },
     ]
   },
   bilibili: {
     label: '偵測到 Bilibili 連結',
     color: '#00a1d6',
     services: [
-      { name: 'DLBunny', url: 'https://dlbunny.com/en/bilibili', desc: 'dlbunny.com — 支援多格式，免安裝' },
-      { name: 'VideoDubber', url: 'https://videodubber.ai/tools/bilibili/video-downloader/', desc: 'videodubber.ai — 支援字幕下載' },
-      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源工具，支援 B站' },
+      { name: 'DLBunny', url: 'https://dlbunny.com/en/bilibili', autofill: null, desc: 'dlbunny.com — 支援多格式，免安裝' },
+      { name: 'VideoDubber', url: 'https://videodubber.ai/tools/bilibili/video-downloader/', autofill: null, desc: 'videodubber.ai — 支援字幕下載' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', autofill: 'https://cobalt.tools/?u=', desc: 'cobalt.tools — 開源工具，支援 B站' },
     ]
   },
   youtube: {
     label: '偵測到 YouTube 連結',
     color: '#ff0000',
     services: [
-      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源，支援多畫質，最推薦' },
-      { name: 'Y2Mate', url: 'https://www.y2mate.com/zh-tw', desc: 'y2mate.com — 線上快速下載' },
-      { name: 'yt-dlp（進階）', url: 'https://github.com/yt-dlp/yt-dlp', desc: 'github.com — 最強大工具，需電腦安裝' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', autofill: 'https://cobalt.tools/?u=', desc: 'cobalt.tools — 開源，支援多畫質，最推薦' },
+      { name: 'Y2Mate', url: 'https://www.y2mate.com/zh-tw', autofill: null, desc: 'y2mate.com — 線上快速下載' },
+      { name: 'yt-dlp（進階）', url: 'https://github.com/yt-dlp/yt-dlp', autofill: null, desc: 'github.com — 最強大工具，需電腦安裝' },
     ]
   },
   tiktok: {
     label: '偵測到 TikTok 連結',
     color: '#ff0050',
     services: [
-      { name: 'SSSTik', url: 'https://ssstik.io/zh-tw', desc: 'ssstik.io — 無浮水印下載' },
-      { name: 'SnapTik', url: 'https://snaptik.app/zh-tw', desc: 'snaptik.app — 快速無浮水印' },
-      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源工具，支援 TikTok' },
+      { name: 'SSSTik', url: 'https://ssstik.io/zh-tw', autofill: 'https://ssstik.io/zh-tw#url=', desc: 'ssstik.io — 無浮水印下載' },
+      { name: 'SnapTik', url: 'https://snaptik.app/zh-tw', autofill: null, desc: 'snaptik.app — 快速無浮水印' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', autofill: 'https://cobalt.tools/?u=', desc: 'cobalt.tools — 開源工具，支援 TikTok' },
     ]
   },
   twitter: {
     label: '偵測到 Twitter / X 連結',
     color: '#1d9bf0',
     services: [
-      { name: 'Cobalt', url: 'https://cobalt.tools/', desc: 'cobalt.tools — 開源，支援 Twitter/X' },
-      { name: 'SaveTwitter', url: 'https://www.savetwitter.net/', desc: 'savetwitter.net — 支援 GIF 下載' },
-      { name: 'TwitXR', url: 'https://twitxr.com/', desc: 'twitxr.com — X 影片快速下載' },
+      { name: 'Cobalt', url: 'https://cobalt.tools/', autofill: 'https://cobalt.tools/?u=', desc: 'cobalt.tools — 開源，支援 Twitter/X' },
+      { name: 'SaveTwitter', url: 'https://www.savetwitter.net/', autofill: null, desc: 'savetwitter.net — 支援 GIF 下載' },
+      { name: 'TwitXR', url: 'https://twitxr.com/', autofill: null, desc: 'twitxr.com — X 影片快速下載' },
     ]
   }
 };
@@ -518,7 +542,7 @@ function openExternal(url) {
 function detectPlatform(url) {
   url = url.toLowerCase();
   if (url.includes('instagram.com')) return 'instagram';
-  if (url.includes('threads.net')) return 'threads';
+  if (url.includes('threads.net') || url.includes('threads.com')) return 'threads';
   if (url.includes('bilibili.com') || url.includes('b23.tv')) return 'bilibili';
   if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
   if (url.includes('tiktok.com')) return 'tiktok';
@@ -533,21 +557,29 @@ function showResult(platform) {
   const panel = document.getElementById('resultPanel');
   const title = document.getElementById('resultTitle');
   const list = document.getElementById('serviceList');
+  const currentUrl = document.getElementById('urlInput').value.trim();
 
   title.textContent = '✓ ' + data.label + ' — 選擇下載服務';
-  list.innerHTML = data.services.map(s => `
-    <div class="service-link" onclick="openExternal('${s.url}')" role="button" tabindex="0">
-      <div>
-        <div class="service-link-name">${s.name}</div>
-        <div class="service-link-url">${s.desc}</div>
+  list.innerHTML = data.services.map(s => {
+    const targetUrl = (s.autofill && currentUrl)
+      ? s.autofill + encodeURIComponent(currentUrl)
+      : s.url;
+    const hint = (s.autofill && currentUrl)
+      ? '<span class="autofill-tag">自動帶入連結 ✓</span>'
+      : (currentUrl ? '<span class="manual-tag">需手動貼上連結</span>' : '');
+    return `
+      <div class="service-link" onclick="openExternal('${targetUrl}')" role="button" tabindex="0">
+        <div>
+          <div class="service-link-name">${s.name} ${hint}</div>
+          <div class="service-link-url">${s.desc}</div>
+        </div>
+        <div class="service-link-arrow">↗</div>
       </div>
-      <div class="service-link-arrow">↗</div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   panel.classList.add('visible');
 
-  // Highlight matching card
   document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
   const match = document.querySelector(`.card[data-platform="${platform}"]`);
   if (match) {
